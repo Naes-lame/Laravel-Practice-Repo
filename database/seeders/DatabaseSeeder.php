@@ -6,6 +6,12 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use App\Models\Department;
+use App\Models\Section;
+use App\Models\Student;
+use App\Models\Profile;
+
+
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -15,11 +21,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $department = Department::create(['name' => 'Computer Department']);
+        $sections = ['Animations', 'IT', 'Computer Science'];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        foreach ($sections as $name) {
+            $section = Section::create([
+                'name' => $name,
+                'department_id' => $department->id,
+            ]);
+
+            Student::factory()
+                ->count(20)
+                ->create(['section_id' => $section->id])
+                ->each(function ($student) {
+                    $student->profile()->create([
+                        'address' => fake()->address(),
+                        'birthday' => fake()->date('Y-m-d', '2005-01-01'),
+                    ]);
+                });
+        }
+
     }
 }
